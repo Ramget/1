@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Ledger — Work Management System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Newsreader:ital,opsz,wght@0,6..72,500;1,6..72,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ============================== LOADING OVERLAY ============================== -->
+<div id="loadingOverlay" class="loading-overlay hidden" aria-hidden="true">
+  <div class="spinner" role="status" aria-label="Loading"></div>
+</div>
+
+<!-- ============================== TOASTS ============================== -->
+<div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+<!-- ============================== LOGIN SCREEN ============================== -->
+<div id="loginScreen" class="login-screen">
+  <div class="login-card">
+    <div class="login-brand">
+      <span class="brand-mark">₹</span>
+      <div>
+        <h1>Ledger</h1>
+        <p>Work &amp; payment management</p>
+      </div>
+    </div>
+    <form id="loginForm" class="login-form" autocomplete="off">
+      <label class="field">
+        <span class="field-label">Mobile number</span>
+        <input type="tel" id="loginMobile" inputmode="numeric" pattern="[0-9]*" required placeholder="10-digit mobile number" />
+      </label>
+      <label class="field">
+        <span class="field-label">Password</span>
+        <input type="password" id="loginPassword" required placeholder="Enter password" />
+      </label>
+      <button type="submit" class="btn btn-primary btn-block" id="loginSubmitBtn">Log in</button>
+      <p class="login-error" id="loginError" hidden></p>
+    </form>
+  </div>
+</div>
+
+<!-- ============================== APP SHELL ============================== -->
+<div id="appShell" class="app-shell hidden">
+
+  <!-- ---------- Sidebar (desktop) ---------- -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <span class="brand-mark">₹</span>
+      <span class="brand-word">Ledger</span>
+    </div>
+    <nav class="sidebar-nav" id="sidebarNav">
+      <button class="nav-item active" data-view="dashboard">
+        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M4 13h6V4H4v9zm0 7h6v-5H4v5zm10 0h6V11h-6v9zm0-16v5h6V4h-6z"/></svg>
+        <span>Dashboard</span>
+      </button>
+      <button class="nav-item" data-view="work">
+        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M20 6h-4V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2H4a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2zM10 4h4v2h-4V4z"/></svg>
+        <span>Work</span>
+      </button>
+      <button class="nav-item" data-view="payment">
+        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zM4 8V6h16v2H4zm0 4h16v6H4v-6z"/></svg>
+        <span>Payment</span>
+      </button>
+      <button class="nav-item" data-view="task">
+        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M19 3h-4.18A3 3 0 0 0 12 1a3 3 0 0 0-2.82 2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zm-7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm-1.5 13.5-3-3 1.4-1.4 1.6 1.6 4.6-4.6 1.4 1.4z"/></svg>
+        <span>Task</span>
+      </button>
+      <button class="nav-item admin-only" data-view="amount">
+        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
+        <span>Amount</span>
+      </button>
+      <button class="nav-item" data-view="expense">
+        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M20 4H4a2 2 0 0 0-2 2v2h20V6a2 2 0 0 0-2-2zM2 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-8H2v8zm4-4h4v2H6v-2z"/></svg>
+        <span>Expense</span>
+      </button>
+      <button class="nav-item admin-only" data-view="settings">
+        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M19.4 13a7.5 7.5 0 0 0 0-2l2.1-1.6a.5.5 0 0 0 .1-.6l-2-3.4a.5.5 0 0 0-.6-.2l-2.5 1a7.6 7.6 0 0 0-1.7-1L14.4 2.5a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 0-.5.5L9 5.2a7.6 7.6 0 0 0-1.7 1l-2.5-1a.5.5 0 0 0-.6.2l-2 3.4a.5.5 0 0 0 .1.6L4.6 11a7.5 7.5 0 0 0 0 2l-2.1 1.6a.5.5 0 0 0-.1.6l2 3.4c.1.2.4.3.6.2l2.5-1c.5.4 1.1.8 1.7 1l.4 2.7c0 .3.2.5.5.5h4c.3 0 .5-.2.5-.5l.4-2.7c.6-.2 1.2-.6 1.7-1l2.5 1c.2.1.5 0 .6-.2l2-3.4a.5.5 0 0 0-.1-.6L19.4 13zM12 15.5A3.5 3.5 0 1 1 12 8.5a3.5 3.5 0 0 1 0 7z"/></svg>
+        <span>Settings</span>
+      </button>
+    </nav>
+    <button class="logout-btn" id="logoutBtn">
+      <svg class="nav-icon" viewBox="0 0 24 24"><path d="M16 13v-2H7V8l-5 4 5 4v-3zM20 3H9a2 2 0 0 0-2 2v4h2V5h11v14H9v-4H7v4a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2z"/></svg>
+      <span>Log out</span>
+    </button>
+  </aside>
+
+  <!-- ---------- Main column ---------- -->
+  <div class="main-col">
+
+    <!-- Top bar -->
+    <header class="topbar">
+      <button class="icon-btn menu-toggle" id="menuToggle" aria-label="Menu">
+        <svg viewBox="0 0 24 24"><path d="M3 6h18v2H3zM3 11h18v2H3zM3 16h18v2H3z"/></svg>
+      </button>
+      <h2 class="view-title" id="viewTitle">Dashboard</h2>
+      <div class="topbar-search" id="topbarSearch">
+        <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 1 0-.7.7l.27.28v.79l5 5L20.5 19l-5-5zm-6 0A4.5 4.5 0 1 1 14 9.5 4.5 4.5 0 0 1 9.5 14z"/></svg>
+        <input type="search" id="globalSearch" placeholder="Search this list…" />
+      </div>
+      <div class="topbar-user">
+        <span class="avatar" id="userAvatar">A</span>
+        <div class="user-meta">
+          <span class="user-name" id="userName">—</span>
+          <span class="user-role" id="userRole">—</span>
+        </div>
+      </div>
+    </header>
+
+    <main class="view-area" id="viewArea">
+
+      <!-- ================= DASHBOARD ================= -->
+      <section class="view active" id="view-dashboard">
+        <div class="card-grid card-grid-stats">
+          <div class="stat-card stat-primary">
+            <span class="stat-label">Total pending amount</span>
+            <span class="stat-value" id="statTotalPending">₹0</span>
+            <span class="stat-sub" id="statTotalPendingSub">Work vs payments received</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Current month expense</span>
+            <span class="stat-value" id="statMonthExpense">₹0</span>
+            <span class="stat-sub">This calendar month</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Current balance</span>
+            <span class="stat-value" id="statBalance">₹0</span>
+            <span class="stat-sub">Amount received − expenses</span>
+          </div>
+          <div class="stat-card stat-tasks">
+            <span class="stat-label">This month's tasks</span>
+            <div class="task-mini-summary">
+              <div><strong id="statTaskPending">0</strong><span>Pending</span></div>
+              <div><strong id="statTaskProgress">0</strong><span>In progress</span></div>
+              <div><strong id="statTaskDone">0</strong><span>Completed</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-head">
+          <h3>Client-wise pending balance</h3>
+        </div>
+        <div class="card-grid" id="clientPendingGrid"></div>
+
+        <div class="section-head">
+          <h3>Pending tasks</h3>
+        </div>
+        <div class="list-panel" id="pendingTaskList"></div>
+      </section>
+
+      <!-- ================= WORK ================= -->
+      <section class="view" id="view-work">
+        <div class="module-tabs">
+          <button class="module-tab active" data-tab="form">New entry</button>
+          <button class="module-tab" data-tab="list">Work list</button>
+        </div>
+
+        <div class="module-pane active" data-pane="form">
+          <form class="entry-form" id="workForm">
+            <input type="hidden" id="workId" />
+            <label class="field">
+              <span class="field-label">Client</span>
+              <select id="workClient" required></select>
+            </label>
+            <label class="field">
+              <span class="field-label">Work type</span>
+              <select id="workType" required></select>
+            </label>
+            <label class="field field-full">
+              <span class="field-label">Work description</span>
+              <textarea id="workDescription" rows="3" placeholder="Optional details about the work"></textarea>
+            </label>
+            <label class="field">
+              <span class="field-label">Amount (₹)</span>
+              <input type="number" id="workAmount" min="0" step="0.01" required />
+            </label>
+            <div class="form-actions field-full">
+              <button type="button" class="btn btn-ghost" id="workCancelBtn" hidden>Cancel edit</button>
+              <button type="submit" class="btn btn-primary" id="workSubmitBtn">Save work entry</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="module-pane" data-pane="list">
+          <div class="table-wrap">
+            <table class="data-table" id="workTable">
+              <thead><tr><th>Date</th><th>Client</th><th>Work type</th><th>Description</th><th class="num">Amount</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= PAYMENT ================= -->
+      <section class="view" id="view-payment">
+        <div class="module-tabs">
+          <button class="module-tab active" data-tab="form">New entry</button>
+          <button class="module-tab" data-tab="list">Payment list</button>
+        </div>
+
+        <div class="module-pane active" data-pane="form">
+          <form class="entry-form" id="paymentForm">
+            <input type="hidden" id="paymentId" />
+            <label class="field field-autocomplete">
+              <span class="field-label">Client name</span>
+              <input type="text" id="paymentClient" autocomplete="off" required placeholder="Start typing a client name" />
+              <div class="autocomplete-list" id="paymentClientList"></div>
+            </label>
+            <label class="field">
+              <span class="field-label">Amount (₹)</span>
+              <input type="number" id="paymentAmount" min="0" step="0.01" required />
+            </label>
+            <label class="field">
+              <span class="field-label">Payment type</span>
+              <select id="paymentType" required></select>
+            </label>
+            <label class="field">
+              <span class="field-label">Payment received date</span>
+              <input type="date" id="paymentDate" required />
+            </label>
+            <div class="form-actions field-full">
+              <button type="button" class="btn btn-ghost" id="paymentCancelBtn" hidden>Cancel edit</button>
+              <button type="submit" class="btn btn-primary" id="paymentSubmitBtn">Save payment</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="module-pane" data-pane="list">
+          <div class="table-wrap">
+            <table class="data-table" id="paymentTable">
+              <thead><tr><th>Received date</th><th>Client</th><th>Type</th><th class="num">Amount</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= TASK ================= -->
+      <section class="view" id="view-task">
+        <div class="module-tabs">
+          <button class="module-tab active" data-tab="form">New task</button>
+          <button class="module-tab" data-tab="list">All tasks</button>
+        </div>
+
+        <div class="module-pane active" data-pane="form">
+          <form class="entry-form" id="taskForm">
+            <input type="hidden" id="taskId" />
+            <label class="field field-full">
+              <span class="field-label">Task title</span>
+              <input type="text" id="taskTitle" required placeholder="e.g. Deliver highlight video — Vishal Studio" />
+            </label>
+            <label class="field field-full">
+              <span class="field-label">Task description</span>
+              <textarea id="taskDescription" rows="3" placeholder="Optional"></textarea>
+            </label>
+            <label class="field">
+              <span class="field-label">Status</span>
+              <select id="taskStatus">
+                <option>Pending</option>
+                <option>In Progress</option>
+                <option>Completed</option>
+              </select>
+            </label>
+            <div class="form-actions field-full">
+              <button type="button" class="btn btn-ghost" id="taskCancelBtn" hidden>Cancel edit</button>
+              <button type="submit" class="btn btn-primary" id="taskSubmitBtn">Save task</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="module-pane" data-pane="list">
+          <div class="table-wrap">
+            <table class="data-table" id="taskTable">
+              <thead><tr><th>Date</th><th>Title</th><th>Status</th><th>Completed</th><th class="admin-only">Delete</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= AMOUNT (admin only) ================= -->
+      <section class="view admin-only" id="view-amount">
+        <div class="module-tabs">
+          <button class="module-tab active" data-tab="form">New entry</button>
+          <button class="module-tab" data-tab="list">Amount list</button>
+        </div>
+
+        <div class="module-pane active" data-pane="form">
+          <form class="entry-form" id="amountForm">
+            <input type="hidden" id="amountId" />
+            <label class="field">
+              <span class="field-label">Payer</span>
+              <input type="text" id="amountPayer" required placeholder="Who paid in?" />
+            </label>
+            <label class="field">
+              <span class="field-label">Amount (₹)</span>
+              <input type="number" id="amountValue" min="0" step="0.01" required />
+            </label>
+            <label class="field">
+              <span class="field-label">Payment type</span>
+              <select id="amountType" required></select>
+            </label>
+            <div class="form-actions field-full">
+              <button type="button" class="btn btn-ghost" id="amountCancelBtn" hidden>Cancel edit</button>
+              <button type="submit" class="btn btn-primary" id="amountSubmitBtn">Save amount</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="module-pane" data-pane="list">
+          <div class="table-wrap">
+            <table class="data-table" id="amountTable">
+              <thead><tr><th>Date</th><th>Payer</th><th>Type</th><th class="num">Amount</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= EXPENSE ================= -->
+      <section class="view" id="view-expense">
+        <div class="module-tabs">
+          <button class="module-tab active" data-tab="form">New entry</button>
+          <button class="module-tab" data-tab="list">Expense list</button>
+        </div>
+
+        <div class="module-pane active" data-pane="form">
+          <form class="entry-form" id="expenseForm">
+            <input type="hidden" id="expenseId" />
+            <label class="field">
+              <span class="field-label">Expense item</span>
+              <input type="text" id="expenseItem" required placeholder="e.g. Drone battery" />
+            </label>
+            <label class="field">
+              <span class="field-label">Amount (₹)</span>
+              <input type="number" id="expenseAmount" min="0" step="0.01" required />
+            </label>
+            <div class="form-actions field-full">
+              <button type="button" class="btn btn-ghost" id="expenseCancelBtn" hidden>Cancel edit</button>
+              <button type="submit" class="btn btn-primary" id="expenseSubmitBtn">Save expense</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="module-pane" data-pane="list">
+          <div class="table-wrap">
+            <table class="data-table" id="expenseTable">
+              <thead><tr><th>Date</th><th>Item</th><th class="num">Amount</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= SETTINGS (admin only) ================= -->
+      <section class="view admin-only" id="view-settings">
+        <div class="settings-grid">
+          <div class="settings-panel">
+            <h3>Client management</h3>
+            <form class="inline-form" id="clientForm">
+              <input type="text" id="newClientName" placeholder="New client name" required />
+              <button type="submit" class="btn btn-primary">Add</button>
+            </form>
+            <ul class="chip-list" id="clientChipList"></ul>
+          </div>
+          <div class="settings-panel">
+            <h3>Work type management</h3>
+            <form class="inline-form" id="workTypeForm">
+              <input type="text" id="newWorkTypeName" placeholder="New work type" required />
+              <button type="submit" class="btn btn-primary">Add</button>
+            </form>
+            <ul class="chip-list" id="workTypeChipList"></ul>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ---------- Bottom nav (mobile) ---------- -->
+  <nav class="bottom-nav" id="bottomNav">
+    <button class="bnav-item active" data-view="dashboard">
+      <svg viewBox="0 0 24 24"><path d="M4 13h6V4H4v9zm0 7h6v-5H4v5zm10 0h6V11h-6v9zm0-16v5h6V4h-6z"/></svg>
+      <span>Home</span>
+    </button>
+    <button class="bnav-item" data-view="work">
+      <svg viewBox="0 0 24 24"><path d="M20 6h-4V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2H4a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2z"/></svg>
+      <span>Work</span>
+    </button>
+    <button class="bnav-item" data-view="payment">
+      <svg viewBox="0 0 24 24"><path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/></svg>
+      <span>Payment</span>
+    </button>
+    <button class="bnav-item" data-view="task">
+      <svg viewBox="0 0 24 24"><path d="M19 3h-4.18A3 3 0 0 0 12 1a3 3 0 0 0-2.82 2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2z"/></svg>
+      <span>Task</span>
+    </button>
+    <button class="bnav-item" id="bnavMore">
+      <svg viewBox="0 0 24 24"><path d="M12 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm0 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm0 6a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/></svg>
+      <span>More</span>
+    </button>
+  </nav>
+
+  <!-- ---------- "More" sheet for mobile (Amount / Expense / Settings / Logout) ---------- -->
+  <div class="sheet-backdrop hidden" id="moreSheetBackdrop">
+    <div class="sheet" id="moreSheet">
+      <div class="sheet-handle"></div>
+      <button class="sheet-item admin-only" data-view="amount">Amount</button>
+      <button class="sheet-item" data-view="expense">Expense</button>
+      <button class="sheet-item admin-only" data-view="settings">Settings</button>
+      <button class="sheet-item sheet-item-danger" id="sheetLogoutBtn">Log out</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- ============================== TASK STATUS MODAL ============================== -->
+<div class="modal-backdrop hidden" id="taskModalBackdrop">
+  <div class="modal" role="dialog" aria-modal="true">
+    <h3 id="taskModalTitle">Update task</h3>
+    <p class="modal-sub" id="taskModalDesc"></p>
+    <label class="field">
+      <span class="field-label">Status</span>
+      <select id="taskModalStatus">
+        <option>Pending</option>
+        <option>In Progress</option>
+        <option>Completed</option>
+      </select>
+    </label>
+    <div class="form-actions">
+      <button class="btn btn-ghost" id="taskModalCancel">Cancel</button>
+      <button class="btn btn-primary" id="taskModalSave">Save</button>
+    </div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
