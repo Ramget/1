@@ -8,7 +8,7 @@
  */
 
 // ⚠️ SET THIS to your deployed Apps Script Web App URL (…/exec)
-const API_URL = 'https://script.google.com/macros/s/AKfycbx7QkOsieYmezRhEQ-b1mEvl3zuQB-QyBvZ5Bw1sgTl4o-NESAq2aLcduGEbWZTcMBEEA/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbz_t7AYjudyD0SjsShoTfq89Fe_agbZ2yPdGCGqeoUsRVfFAi0yoMsQ0cJDkhGNdALobA/exec';
 
 const SESSION_KEY = 'ledger_session_v1';
 const CACHE_KEY = 'ledger_lists_cache_v1';
