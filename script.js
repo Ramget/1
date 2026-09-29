@@ -8,7 +8,7 @@
  */
 
 // ⚠️ SET THIS to your deployed Apps Script Web App URL (…/exec)
-const API_URL = 'https://script.google.com/macros/s/AKfycbz6Tz-SZ7bUKZHp1eWWQE3luu9zg2CMxYc6Z5GfpU-3Muxc8lenwGRvAgXyQovqGPgScA/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbx7QkOsieYmezRhEQ-b1mEvl3zuQB-QyBvZ5Bw1sgTl4o-NESAq2aLcduGEbWZTcMBEEA/exec';
 
 const SESSION_KEY = 'ledger_session_v1';
 const CACHE_KEY = 'ledger_lists_cache_v1';
@@ -33,13 +33,15 @@ const state = {
 async function api(action, payload) {
   showLoading(true);
   try {
-    const res = await fetch(API_URL, {
-      method: 'POST',
-      // text/plain avoids a CORS preflight, which Apps Script Web Apps
-      // cannot answer.
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ action, payload: payload || {} })
-    });
+    // GET + query params, NOT POST. Apps Script's /exec URL internally
+    // redirects, and browsers downgrade a POST to GET on that redirect
+    // (dropping the body) — which is what causes the classic "No action
+    // specified" error. A GET request stays a GET through the redirect,
+    // so the query string always survives.
+    const url = new URL(API_URL);
+    url.searchParams.set('action', action);
+    url.searchParams.set('payload', JSON.stringify(payload || {}));
+    const res = await fetch(url.toString(), { method: 'GET' });
     const json = await res.json();
     if (!json.success) throw new Error(json.message || 'Something went wrong.');
     return json.data;
